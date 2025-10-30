@@ -1,0 +1,19 @@
+{
+  "name": "wordilo-backend",
+  "version": "1.0.0",
+  "description": "Wordilo - a vocabulary builder application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IamAshrafee/Wordilo.git"
+  },
+  "author": "ashrafee",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IamAshrafee/Wordilo/issues"
+  },
+  "homepage": "https://github.com/IamAshrafee/Wordilo#readme"
+}
