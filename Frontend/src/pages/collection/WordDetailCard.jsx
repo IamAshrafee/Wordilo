@@ -2,7 +2,7 @@ import React from "react";
 
 const WordDetailCard = () => {
   return (
-    <div className="py-4 px-6 border border-gray-200 rounded-lg w-[800px]">
+    <div className="py-4 px-6 border border-gray-200 rounded-lg w-[800px] transition-all duration-300">
       <div>
         <h2 className="font-istok text-2xl font-bold  mt-2">Book</h2>
         <div className="mt-4">

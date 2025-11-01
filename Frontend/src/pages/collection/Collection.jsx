@@ -1,9 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import MainWidth from "../../components/layout/MainWidth";
 import WordCard from "../../components/ui/WordCard";
 import WordDetailCard from "./WordDetailCard";
 
 const Collection = () => {
+  const [isClicked, setClicked] = useState(false);
+
+  const HandleWordClick = () => {
+    if (isClicked === false) {
+      setClicked(true);
+    } else {
+      setClicked(false);
+    }
+  };
+
   return (
     <div className="mt-8">
       <MainWidth>
@@ -16,34 +26,46 @@ const Collection = () => {
                 meaning="A collection of paper binned where some knowledge written
                   there"
                 description="Suppose, our academical books"
+                onClick={HandleWordClick}
               />
               <WordCard
                 word="Book"
                 meaning="A collection of paper binned where some knowledge written
                   there"
                 description="Suppose, our academical books"
+                onClick={HandleWordClick}
               />
               <WordCard
                 word="Book"
                 meaning="A collection of paper binned where some knowledge written
                   there"
                 description="Suppose, our academical books"
+                onClick={HandleWordClick}
               />
               <WordCard
                 word="Book"
                 meaning="A collection of paper binned where some knowledge written
                   there"
                 description="Suppose, our academical books"
+                onClick={HandleWordClick}
               />
               <WordCard
                 word="Book"
                 meaning="A collection of paper binned where some knowledge written
                   there"
                 description="Suppose, our academical books"
+                onClick={HandleWordClick}
+              />
+              <WordCard
+                word="Book"
+                meaning="A collection of paper binned where some knowledge written
+                  there"
+                description="Suppose, our academical books"
+                onClick={HandleWordClick}
               />
             </div>
           </div>
-          <WordDetailCard></WordDetailCard>
+          {isClicked ? <WordDetailCard></WordDetailCard> : ""}
         </div>
       </MainWidth>
     </div>
