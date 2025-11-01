@@ -1,6 +1,7 @@
 import { CgProfile } from "react-icons/cg";
 import React from "react";
 import MainWidth from "./MainWidth";
+import { Link } from "react-router";
 
 const DesktopNavbar = () => {
   return (
@@ -23,10 +24,14 @@ const DesktopNavbar = () => {
 
       <div className="font-istok font-bold flex flex-row gap-18 justify-center items-center py-3 border-b border-gray-200">
         <div>
-          <p className="cursor-pointer">Create</p>
+          <Link to={"/create"} className="cursor-pointer">
+            Create
+          </Link>
         </div>
         <div>
-          <p className="cursor-pointer">Collection</p>
+          <Link to={"/collection"} className="cursor-pointer">
+            Collection
+          </Link>
         </div>
         <div>
           <p className="cursor-pointer">Flashcards</p>

@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import RootLayout from "./RootLayout";
 import CreateWord from "./pages/home/CreateWord";
+import Collection from "./pages/collection/Collection";
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
       {
         path: "/create",
         element: <CreateWord />,
+      },
+      {
+        path: "/collection",
+        element: <Collection />,
       },
     ],
   },
