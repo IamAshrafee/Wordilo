@@ -1,64 +1,83 @@
 import React from "react";
 import MainWidth from "../../components/layout/MainWidth";
+import InputBox from "../../components/ui/InputBox";
+import { useForm } from "react-hook-form";
+import {
+  BookOpenIcon,
+  ChatBubbleLeftRightIcon,
+  PencilIcon,
+} from "@heroicons/react/24/outline";
+import TextareaBox from "../../components/ui/TextareaBox";
 
 const CreateWord = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
   return (
     <div className="mt-10 flex justify-center items-center">
       <MainWidth>
-        <div className="w-[800px]">
+        <div className="md:w-[800px]">
           <div className="flex flex-col justify-center items-center">
-            <h1 className="font-istok font-bold text-2xl">
+            <h1 className="font-istok font-bold text-2xl text-center">
               Create a New Vocabulary
             </h1>
-            <p className="font-istok font-medium text-gray-500">
+            <p className="font-istok font-medium text-gray-500 text-center">
               Complete the fields you want to save for the specific word
             </p>
           </div>
-          <div className="mt-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
             <div className="flex flex-col mt-4">
-              <label htmlFor="word" className="font-istok font-bold text-base">
-                Word
-              </label>
-              <input
-                type="text"
+              <InputBox
                 id="word"
                 name="word"
+                label="Word"
                 placeholder="Type your word"
-                className="border border-gray-300 rounded focus:border focus:border-gray-500 outline-none p-1 px-2 font-istok"
+                icon={BookOpenIcon}
+                error={errors.word?.message}
+                {...register("word", { required: "Word is required" })}
               />
             </div>
             <div className="flex flex-col mt-4">
-              <label
-                htmlFor="meanings"
-                className="font-istok font-bold text-base"
-              >
-                Meanings
-              </label>
-              <input
-                type="text"
+              <InputBox
                 id="meanings"
                 name="meanings"
+                label="Meanings"
                 placeholder="Type meanings sperated by comma"
-                className="border border-gray-300 rounded focus:border focus:border-gray-500 outline-none p-1 px-2 font-istok"
+                icon={ChatBubbleLeftRightIcon}
+                error={errors.meanings?.message}
+                {...register("meanings", {
+                  required: "Meanings are required",
+                })}
               />
             </div>
             <div className="flex flex-col mt-4">
-              <label
-                htmlFor="description"
-                className="font-istok font-bold text-base"
-              >
-                Description
-              </label>
-              <textarea
-                type="text"
+              <TextareaBox
                 id="description"
                 name="description"
-                rows={2}
+                label="Description"
                 placeholder="e.g. usages of the word, why its invented, different purchase etc"
-                className="border border-gray-300 rounded focus:border focus:border-gray-500 outline-none p-1 px-2 font-istok"
+                icon={PencilIcon}
+                error={errors.description?.message}
+                optional={true}
+                {...register("description")}
               />
             </div>
-          </div>
+            <div className="flex justify-end mt-4">
+              <button
+                type="submit"
+                className="bg-indigo-600 text-white font-istok font-bold px-4 py-2 rounded-md hover:bg-indigo-700"
+              >
+                Create Word
+              </button>
+            </div>
+          </form>
         </div>
       </MainWidth>
     </div>
