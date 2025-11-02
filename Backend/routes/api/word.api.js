@@ -1,8 +1,17 @@
 const express = require("express");
-const { wordCreate, words } = require("../../controller/word.controller");
+const {
+  wordCreate,
+  words,
+  word,
+  updateWord,
+  deleteWord,
+} = require("../../controller/word.controller");
 const wordRoutes = express.Router();
 
 wordRoutes.post("/create", wordCreate);
 wordRoutes.get("/get", words);
+wordRoutes.get("/:id", word);
+wordRoutes.patch("/:id", updateWord);
+wordRoutes.delete("/:id", deleteWord);
 
 module.exports = wordRoutes;
