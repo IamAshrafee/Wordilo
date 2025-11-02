@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import MainWidth from "../../components/layout/MainWidth";
 import InputBox from "../../components/ui/InputBox";
 import { useForm } from "react-hook-form";
@@ -8,20 +8,37 @@ import {
   PencilIcon,
 } from "@heroicons/react/24/outline";
 import TextareaBox from "../../components/ui/TextareaBox";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 const CreateWord = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const post = await axios.post(
+        "http://localhost:3000/api/v1/word/create",
+        data
+      );
+      console.log(post);
+      toast.success("Successfully created!");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="mt-10 flex justify-center items-center">
+      <Toaster position="top-center" reverseOrder={false} />
       <MainWidth>
         <div className="md:w-[800px]">
           <div className="flex flex-col justify-center items-center">
@@ -72,9 +89,10 @@ const CreateWord = () => {
             <div className="flex justify-end mt-4">
               <button
                 type="submit"
-                className="bg-indigo-600 text-white font-istok font-bold px-4 py-2 rounded-md hover:bg-indigo-700"
+                className="bg-indigo-600 text-white font-istok font-bold px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-400"
+                disabled={isSubmitting}
               >
-                Create Word
+                {isSubmitting ? "Creating..." : "Create Word"}
               </button>
             </div>
           </form>
