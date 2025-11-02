@@ -54,7 +54,6 @@ const Collection = () => {
     });
 
     console.log(groups);
-    
 
     return groups;
   };
@@ -65,9 +64,6 @@ const Collection = () => {
     const options = { day: "numeric", month: "short", year: "numeric" };
     return date.toLocaleDateString("en-GB", options);
   };
-
-
-
 
   const HandleWordClick = (word) => {
     setSelectedWord(word);
@@ -98,8 +94,18 @@ const Collection = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2 pb-4">
+
+        <div
+          className={`mt-8 grid gap-4 ${
+            selectedWord ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1"
+          }`}
+        >
+          {/* Word List Section - adjusts width based on selection */}
+          <div
+            className={`${
+              selectedWord ? "md:col-span-2" : "col-span-full"
+            } pb-4`}
+          >
             {/* Loop through each date group */}
             {Object.keys(groupedWords)
               .sort()
@@ -124,9 +130,17 @@ const Collection = () => {
                 </div>
               ))}
           </div>
-          <div className="md:col-span-1">
-            {selectedWord && <WordDetailCard word={selectedWord} handleClose={handleClose} handleDelete={handleDelete} />}
-          </div>
+
+          {/* Word Detail Sidebar - only show when a word is selected */}
+          {selectedWord && (
+            <div className="md:col-span-1">
+              <WordDetailCard
+                word={selectedWord}
+                handleClose={handleClose}
+                handleDelete={handleDelete}
+              />
+            </div>
+          )}
         </div>
       </MainWidth>
     </div>
