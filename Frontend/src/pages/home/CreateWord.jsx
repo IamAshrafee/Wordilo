@@ -23,7 +23,7 @@ const CreateWord = () => {
     setIsSubmitting(true);
     try {
       const post = await axios.post(
-        "http://localhost:3000/api/v1/word/create",
+        `${import.meta.env.VITE_BASE_URL}/word/create`,
         data
       );
       console.log(post);

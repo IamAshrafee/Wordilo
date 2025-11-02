@@ -3,6 +3,7 @@ import MainWidth from "../../components/layout/MainWidth";
 import WordCard from "../../components/ui/WordCard";
 import WordDetailCard from "./WordDetailCard";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Collection = () => {
   const [selectedWord, setSelectedWord] = useState(null);
@@ -15,7 +16,7 @@ const Collection = () => {
     const fetchWords = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/v1/word/get"
+          `${import.meta.env.VITE_BASE_URL}/word/get`
         );
         setWords(response.data.data);
       } catch (error) {
@@ -23,7 +24,7 @@ const Collection = () => {
       }
     };
     fetchWords();
-  }, []);
+  }, [words]);
 
   // Group words by date whenever words change
   useEffect(() => {
@@ -53,7 +54,7 @@ const Collection = () => {
       groups[dateString].push(word);
     });
 
-    console.log(groups);
+
 
     return groups;
   };
@@ -75,8 +76,11 @@ const Collection = () => {
 
   const handleDelete = async (wordId) => {
     try {
-      await axios.delete(`http://localhost:3000/api/v1/word/delete/${wordId}`);
-      setWords(words.filter((word) => word._id !== wordId));
+      await axios.delete(`${import.meta.env.VITE_BASE_URL}/word/delete/${wordId}`);
+      const newWords = words.filter((word) => word._id !== wordId);
+      setWords(newWords);
+      const grouped = groupWordsByDate(newWords);
+      setGroupedWords(grouped);
       setSelectedWord(null);
     } catch (error) {
       console.error("Error deleting word:", error);
@@ -95,52 +99,97 @@ const Collection = () => {
           />
         </div>
 
-        <div
-          className={`mt-8 grid gap-4 ${
-            selectedWord ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1"
-          }`}
-        >
-          {/* Word List Section - adjusts width based on selection */}
+        {/* Mobile Overlay Background */}
+        {selectedWord && (
           <div
-            className={`${
-              selectedWord ? "md:col-span-2" : "col-span-full"
-            } pb-4`}
-          >
-            {/* Loop through each date group */}
-            {Object.keys(groupedWords)
-              .sort()
-              .reverse()
-              .map((date) => (
-                <div key={date} className="mb-8">
-                  <p className="font-istok font-bold my-5">
-                    {formatDate(date)}
-                  </p>
-                  <div className="flex flex-wrap gap-4">
-                    {/* Loop through words for this date */}
-                    {groupedWords[date].map((word) => (
-                      <WordCard
-                        key={word._id}
-                        word={word.word}
-                        meaning={word.meanings.join(", ")}
-                        description={word.description}
-                        onClick={() => HandleWordClick(word)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-          </div>
+            className="fixed inset-0 bg-black/50 bg-opacity-50 backdrop-blur-sm z-40 md:hidden"
+            onClick={handleClose}
+          />
+        )}
 
-          {/* Word Detail Sidebar - only show when a word is selected */}
+        <div className={`mt-8 ${selectedWord ? "md:flex md:gap-8" : ""}`}>
+          {/* Word Detail Sidebar - appears on LEFT when word is selected */}
           {selectedWord && (
-            <div className="md:col-span-1">
-              <WordDetailCard
-                word={selectedWord}
-                handleClose={handleClose}
-                handleDelete={handleDelete}
-              />
-            </div>
+            <>
+              {/* Desktop Sidebar - LEFT SIDE */}
+              <div className="hidden md:block md:shrink-0 md:w-96">
+                <div className="sticky top-8 h-[calc(100vh-4rem)]">
+                  <AnimatePresence>
+                    {selectedWord && (
+                      <WordDetailCard
+                        word={selectedWord}
+                        handleClose={handleClose}
+                        handleDelete={handleDelete}
+                      />
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              {/* Mobile Popup */}
+              <AnimatePresence>
+                {selectedWord && (
+                  <motion.div
+                    className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 z-50 md:hidden"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <WordDetailCard
+                      word={selectedWord}
+                      handleClose={handleClose}
+                      handleDelete={handleDelete}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
           )}
+
+          {/* Word List Section - adjusts width based on selection */}
+          <div className={`${selectedWord ? "md:flex-1" : "w-full"} pb-4`}>
+            {/* Loop through each date group */}
+            {Object.keys(groupedWords).length === 0 ? (
+              <p className="text-center text-gray-500">No words found.</p>
+            ) : (
+              Object.keys(groupedWords)
+                .sort()
+                .reverse()
+                .map((date) => (
+                  <div key={date} className="mb-8">
+                    <p className="font-istok font-bold my-5">
+                      {formatDate(date)}
+                    </p>
+                    <motion.div
+                      className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        show: {
+                          opacity: 1,
+                          transition: {
+                            staggerChildren: 0.1,
+                          },
+                        },
+                      }}
+                      initial="hidden"
+                      animate="show"
+                    >
+                      {/* Loop through words for this date */}
+                      {groupedWords[date].map((word) => (
+                        <WordCard
+                          key={word._id}
+                          word={word.word}
+                          meaning={word.meanings.join(", ")}
+                          description={word.description}
+                          onClick={() => HandleWordClick(word)}
+                        />
+                      ))}
+                    </motion.div>
+                  </div>
+                ))
+            )}
+          </div>
         </div>
       </MainWidth>
     </div>
