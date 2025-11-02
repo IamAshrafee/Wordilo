@@ -5,8 +5,9 @@ import WordDetailCard from "./WordDetailCard";
 import axios from "axios";
 
 const Collection = () => {
-  const [isClicked, setClicked] = useState(false);
+  const [selectedWord, setSelectedWord] = useState(null);
   const [words, setWords] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [groupedWords, setGroupedWords] = useState({});
 
   // Fetch words from your API
@@ -16,8 +17,7 @@ const Collection = () => {
         const response = await axios.get(
           "http://localhost:3000/api/v1/word/get"
         );
-        // const data = response;
-        setWords(response.data.data); // data.data because your response has { success, message, data }
+        setWords(response.data.data);
       } catch (error) {
         console.error("Error fetching words:", error);
       }
@@ -28,10 +28,13 @@ const Collection = () => {
   // Group words by date whenever words change
   useEffect(() => {
     if (words.length > 0) {
-      const grouped = groupWordsByDate(words);
+      const filteredWords = words.filter((word) =>
+        word.word.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      const grouped = groupWordsByDate(filteredWords);
       setGroupedWords(grouped);
     }
-  }, [words]);
+  }, [words, searchTerm]);
 
   // This function groups words by their creation date
   const groupWordsByDate = (wordsArray) => {
@@ -63,18 +66,40 @@ const Collection = () => {
     return date.toLocaleDateString("en-GB", options);
   };
 
-    console.log(groupedWords);
 
 
-  const HandleWordClick = () => {
-    setClicked(!isClicked);
+
+  const HandleWordClick = (word) => {
+    setSelectedWord(word);
+  };
+
+  const handleClose = () => {
+    setSelectedWord(null);
+  };
+
+  const handleDelete = async (wordId) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/v1/word/delete/${wordId}`);
+      setWords(words.filter((word) => word._id !== wordId));
+      setSelectedWord(null);
+    } catch (error) {
+      console.error("Error deleting word:", error);
+    }
   };
 
   return (
     <div className="mt-8">
       <MainWidth>
-        <div className="mt-8 flex gap-4">
-          <div className="pb-4">
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search words..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 pb-4">
             {/* Loop through each date group */}
             {Object.keys(groupedWords)
               .sort()
@@ -92,14 +117,16 @@ const Collection = () => {
                         word={word.word}
                         meaning={word.meanings.join(", ")}
                         description={word.description}
-                        onClick={HandleWordClick}
+                        onClick={() => HandleWordClick(word)}
                       />
                     ))}
                   </div>
                 </div>
               ))}
           </div>
-          {isClicked && <WordDetailCard />}
+          <div className="md:col-span-1">
+            {selectedWord && <WordDetailCard word={selectedWord} handleClose={handleClose} handleDelete={handleDelete} />}
+          </div>
         </div>
       </MainWidth>
     </div>
