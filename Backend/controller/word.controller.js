@@ -1,5 +1,5 @@
-const express = require("express");
 const wordSchema = require("../models/wordSchema");
+const sendResponse = require("../helper/sendResponse");
 
 // controller to create a word
 function wordCreate(req, res) {
@@ -13,15 +13,11 @@ function wordCreate(req, res) {
     });
 
     words.save();
-    res.status(201).json({
-      success: true,
-      message: "Word successfully created",
-    });
+    sendResponse(res, 201, true, "Word successfully created");
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Word creation failed",
-      error: error.message,
+    sendResponse(res, 500, false, "Word creation failed", null, {
+      code: 500,
+      details: error.message,
     });
   }
 }
@@ -31,19 +27,11 @@ async function words(req, res) {
   try {
     const words = await wordSchema.find();
 
-    res.status(200).json({
-      success: true,
-      message: "Words fetched successfully.",
-      data: words,
-    });
+    sendResponse(res, 200, true, "Words fetched successfully.", words);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Internal server error.",
-      error: {
-        code: 500,
-        details: error.message,
-      },
+    sendResponse(res, 500, false, "Internal server error.", null, {
+      code: 500,
+      details: error.message,
     });
   }
 }
@@ -54,24 +42,13 @@ async function word(req, res) {
     const id = req.params.id;
     const word = await wordSchema.findById(id);
     if (!word) {
-      res.status(404).json({
-        success: false,
-        message: "Word not found",
-      });
+      return sendResponse(res, 404, false, "Word not found");
     }
-    res.status(200).json({
-      success: true,
-      message: `${word.word} successfully fetched`,
-      data: word,
-    });
+    sendResponse(res, 200, true, `${word.word} successfully fetched`, word);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-      error: {
-        code: 500,
-        details: error.message,
-      },
+    sendResponse(res, 500, false, "Internal Server Error", null, {
+      code: 500,
+      details: error.message,
     });
   }
 }
@@ -85,10 +62,7 @@ async function updateWord(req, res) {
     const previousWord = await wordSchema.findById(id);
 
     if (!previousWord) {
-      return res.status(404).json({
-        success: false,
-        message: "Word not found",
-      });
+      return sendResponse(res, 404, false, "Word not found");
     }
 
     const updateWord = await wordSchema.findByIdAndUpdate(
@@ -99,19 +73,17 @@ async function updateWord(req, res) {
       { new: true }
     );
 
-    res.status(200).json({
-      success: true,
-      message: `${previousWord.word} is successfully updated`,
-      data: updateWord,
-    });
+    sendResponse(
+      res,
+      200,
+      true,
+      `${previousWord.word} is successfully updated`,
+      updateWord
+    );
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "word update failed",
-      error: {
-        code: 500,
-        details: error.message,
-      },
+    sendResponse(res, 500, false, "word update failed", null, {
+      code: 500,
+      details: error.message,
     });
   }
 }
@@ -123,27 +95,22 @@ async function deleteWord(req, res) {
     const checkingWord = await wordSchema.findById(id);
 
     if (!checkingWord) {
-      return res.status(404).json({
-        success: false,
-        message: "word not found",
-      });
+      return sendResponse(res, 404, false, "word not found");
     }
 
     const deleteWord = await wordSchema.findByIdAndDelete(id);
 
-    res.status(200).json({
-      success: true,
-      message: `${deleteWord.word} is successfully deleted`,
-      data: deleteWord,
-    });
+    return sendResponse(
+      res,
+      200,
+      true,
+      `${checkingWord.word} is successfully deleted`,
+      deleteWord
+    );
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "word delete failed",
-      error: {
-        code: 500,
-        details: error.message,
-      },
+    sendResponse(res, 500, false, "word delete failed", null, {
+      code: 500,
+      details: error.message,
     });
   }
 }
