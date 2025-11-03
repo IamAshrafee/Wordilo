@@ -4,6 +4,7 @@ import WordiloLogo from "../../assets/png/Black White Minimal Simple Modern Lett
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import SimpleNotification from "../../components/ui/SimpleNotification";
+import { Link } from "react-router";
 
 const SingUp = () => {
   const {
@@ -23,7 +24,7 @@ const SingUp = () => {
     setIsSubmitting(true);
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/v1/user/create`,
+        `${import.meta.env.VITE_BASE_URL}/user/create`,
         data
       );
       setNotification({
@@ -72,10 +73,7 @@ const SingUp = () => {
                   Sign up a new account
                 </h2>
               </div>
-              <form
-                className="space-y-6"
-                onSubmit={handleSubmit(onSubmit)}
-              >
+              <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div>
                   <div className="col-span-2">
                     <input
@@ -151,12 +149,12 @@ const SingUp = () => {
               </form>
               <p className="text-center text-sm/6 text-gray-500 dark:text-gray-400">
                 Already a member?
-                <a
-                  href="#"
+                <Link
+                  to={"/signin"}
                   className="px-2 font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
                   Click here to signin
-                </a>
+                </Link>
               </p>
             </div>
           </div>

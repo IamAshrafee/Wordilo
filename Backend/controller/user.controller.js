@@ -119,4 +119,34 @@ async function deleteUser(req, res) {
   }
 }
 
-module.exports = { createUser, users, user, updateUser, deleteUser };
+// login a user
+async function loginUser(req, res) {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return sendResponse(res, 400, false, "Email and password are required");
+    }
+
+    const searchUser = await userSchema.findOne({ email });
+    if (!searchUser) {
+      return sendResponse(res, 404, false, "User not found");
+    }
+
+    if (searchUser.password !== password) {
+      return sendResponse(res, 401, false, "Invalid credentials");
+    }
+
+    sendResponse(res, 200, true, "Login successful", {
+      id: searchUser._id,
+      username: searchUser.username,
+      email: searchUser.email,
+    });
+  } catch (error) {
+    sendResponse(res, 500, false, "user login failed", null, {
+      code: 500,
+      details: error.message,
+    });
+  }
+}
+
+module.exports = { createUser, users, user, updateUser, deleteUser, loginUser };

@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import MainWidth from "../../components/layout/MainWidth";
 import WordiloLogo from "../../assets/png/Black White Minimal Simple Modern Letter A  Arts Gallery  Logo (1).png";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import SimpleNotification from "../../components/ui/SimpleNotification";
+import { Link } from "react-router";
 
 const Login = () => {
   const {
@@ -9,11 +12,48 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notification, setNotification] = useState({
+    show: false,
+    title: "",
+    message: "",
+    type: "",
+  });
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/user/login`,
+        data
+      );
+      setNotification({
+        show: true,
+        title: "Success",
+        message: response.data.message,
+        type: "success",
+      });
+    } catch (error) {
+      setNotification({
+        show: true,
+        title: "Error",
+        message: error.response.data.message,
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="h-full">
+      <SimpleNotification
+        show={notification.show}
+        setShow={(val) => setNotification({ ...notification, show: val })}
+        title={notification.title}
+        message={notification.message}
+        type={notification.type}
+      />
       <MainWidth>
         <div className="h-full">
           <>
@@ -34,18 +74,19 @@ const Login = () => {
                     Sign in to your account
                   </h2>
                 </div>
-                <form
-                  onSubmit={handleSubmit(onSubmit)}
-                  className="space-y-6"
-                >
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <div>
                     <div className="col-span-2">
                       <input
-                        {...register("email", { required: "Email is required" })}
+                        {...register("email", {
+                          required: "Email is required",
+                        })}
                         id="email-address"
                         name="email"
                         type="email"
-                        placeholder={errors.email ? errors.email.message : "Email address"}
+                        placeholder={
+                          errors.email ? errors.email.message : "Email address"
+                        }
                         autoComplete="email"
                         aria-label="Email address"
                         aria-invalid={errors.email ? "true" : "false"}
@@ -58,11 +99,15 @@ const Login = () => {
                     </div>
                     <div className="-mt-px">
                       <input
-                        {...register("password", { required: "Password is required" })}
+                        {...register("password", {
+                          required: "Password is required",
+                        })}
                         id="password"
                         name="password"
                         type="password"
-                        placeholder={errors.password ? errors.password.message : "Password"}
+                        placeholder={
+                          errors.password ? errors.password.message : "Password"
+                        }
                         autoComplete="current-password"
                         aria-label="Password"
                         aria-invalid={errors.password ? "true" : "false"}
@@ -128,21 +173,22 @@ const Login = () => {
                   <div>
                     <button
                       type="submit"
-                      className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
+                      disabled={isSubmitting}
+                      className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500 disabled:bg-indigo-400"
                     >
-                      Sign in
+                      {isSubmitting ? "Signing in..." : "Sign in"}
                     </button>
                   </div>
                 </form>
 
                 <p className="text-center text-sm/6 text-gray-500 dark:text-gray-400">
                   Not a member?{" "}
-                  <a
-                    href="#"
+                  <Link
+                    to={"/signup"}
                     className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
                   >
                     Signup Now!
-                  </a>
+                  </Link>
                 </p>
               </div>
             </div>
