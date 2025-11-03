@@ -24,6 +24,10 @@ const router = createBrowserRouter([
         path: "/flashcards",
         element: <FlashCard />,
       },
+      {
+        path: "/modify-word/:wordId",
+        element: <CreateWord />,
+      }
     ],
   },
 ]);

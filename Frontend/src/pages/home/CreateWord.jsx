@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainWidth from "../../components/layout/MainWidth";
 import InputBox from "../../components/ui/InputBox";
 import { useForm } from "react-hook-form";
@@ -10,24 +10,58 @@ import {
 import TextareaBox from "../../components/ui/TextareaBox";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { useParams, useNavigate } from "react-router";
 
 const CreateWord = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { wordId } = useParams();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm();
+
+  const isEditMode = Boolean(wordId);
+
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchWord = async () => {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_BASE_URL}/word/${wordId}`
+          );
+          const word = response.data.data;
+          setValue("word", word.word);
+          setValue("meanings", word.meanings.join(", "));
+          setValue("description", word.description);
+        } catch (error) {
+          console.error("Error fetching word:", error);
+          toast.error("Failed to load word data.");
+        }
+      };
+      fetchWord();
+    }
+  }, [isEditMode, wordId, setValue]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      const post = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/word/create`,
-        data
-      );
-      console.log(post);
-      toast.success("Successfully created!");
+      if (isEditMode) {
+        await axios.patch(
+          `${import.meta.env.VITE_BASE_URL}/word/update/${wordId}`,
+          data
+        );
+        toast.success("Successfully updated!");
+        navigate("/collection");
+      } else {
+        await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/word/create`,
+          data
+        );
+        toast.success("Successfully created!");
+      }
     } catch (error) {
       console.log(error);
       toast.error(error.message);
@@ -43,7 +77,7 @@ const CreateWord = () => {
         <div className="md:w-[800px]">
           <div className="flex flex-col justify-center items-center">
             <h1 className="font-istok font-bold text-2xl text-center">
-              Create a New Vocabulary
+              {isEditMode ? "Modify Your Vocabulary" : "Create a New Vocabulary"}
             </h1>
             <p className="font-istok font-medium text-gray-500 text-center">
               Complete the fields you want to save for the specific word
@@ -86,13 +120,28 @@ const CreateWord = () => {
                 {...register("description")}
               />
             </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-4 gap-4">
+              {isEditMode && (
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  className="bg-gray-300 text-gray-800 font-istok font-bold px-4 py-2 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              )}
               <button
                 type="submit"
                 className="bg-indigo-600 text-white font-istok font-bold px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-400"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Creating..." : "Create Word"}
+                {isSubmitting
+                  ? isEditMode
+                    ? "Updating..."
+                    : "Creating..."
+                  : isEditMode
+                  ? "Update"
+                  : "Create Word"}
               </button>
             </div>
           </form>

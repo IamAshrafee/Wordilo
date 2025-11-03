@@ -1,6 +1,7 @@
 import React from "react";
 import MainWidth from "./MainWidth";
 import { CgProfile } from "react-icons/cg";
+import { Link } from "react-router";
 
 const TopNav = () => {
   return (
@@ -8,7 +9,7 @@ const TopNav = () => {
       <MainWidth>
         <div className="flex flex-row justify-between items-center py-5">
           <div>
-            <p className="font-istok font-bold text-2xl">Wordilo</p>
+            <Link to={"/create"} className="font-istok font-bold text-2xl">Wordilo</Link>
           </div>
           <div>
             <CgProfile size={28} />

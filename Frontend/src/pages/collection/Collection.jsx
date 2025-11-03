@@ -91,7 +91,7 @@ const Collection = () => {
 
   const handleDelete = async (wordId) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_BASE_URL}/word/delete/${wordId}`);
+      await axios.delete(`${import.meta.env.VITE_BASE_URL}/word/${wordId}`);
       const newWords = words.filter((word) => word._id !== wordId);
       setWords(newWords);
       handleClose();
@@ -111,7 +111,7 @@ const Collection = () => {
 
     if (selectedWord) {
       document.addEventListener("keydown", handleEscape);
-      
+
       // ONLY disable body scroll on mobile when modal is open
       if (isMobile) {
         document.body.style.overflow = "hidden";
@@ -215,13 +215,15 @@ const Collection = () => {
             {!loading && Object.keys(groupedWords).length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500 text-lg">
-                  {searchTerm ? "No words match your search." : "No words found. Start by adding some words!"}
+                  {searchTerm
+                    ? "No words match your search."
+                    : "No words found. Start by adding some words!"}
                 </p>
               </div>
             )}
 
             {/* Word Groups */}
-            {Object.keys(groupedWords).length > 0 && (
+            {Object.keys(groupedWords).length > 0 &&
               Object.keys(groupedWords)
                 .sort()
                 .reverse()
@@ -256,8 +258,7 @@ const Collection = () => {
                       ))}
                     </motion.div>
                   </div>
-                ))
-            )}
+                ))}
           </div>
         </div>
       </MainWidth>

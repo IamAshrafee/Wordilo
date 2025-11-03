@@ -1,6 +1,7 @@
 import React from "react";
 import { XMarkIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
+import { Link } from "react-router";
 
 const WordDetailCard = ({ word, handleClose, handleDelete }) => {
   if (!word) {
@@ -44,16 +45,17 @@ const WordDetailCard = ({ word, handleClose, handleDelete }) => {
         </div>
         
         <div className="mt-8 flex gap-4 pt-4 border-t border-gray-100">
-          <motion.button 
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            disabled // Temporarily disabled until edit functionality is implemented
-            aria-label="Edit word"
-          >
-            <PencilIcon className="w-5 h-5" />
-            <span className="font-medium">Edit</span>
-          </motion.button>
+          <Link to={`/modify-word/${word._id}`}>
+            <motion.button 
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label="Edit word"
+            >
+              <PencilIcon className="w-5 h-5" />
+              <span className="font-medium">Edit</span>
+            </motion.button>
+          </Link>
           <motion.button 
             onClick={() => {
               if (window.confirm("Are you sure you want to delete this word?")) {
