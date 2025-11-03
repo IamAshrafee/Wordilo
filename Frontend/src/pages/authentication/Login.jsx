@@ -1,21 +1,22 @@
 import React from "react";
 import MainWidth from "../../components/layout/MainWidth";
 import WordiloLogo from "../../assets/png/Black White Minimal Simple Modern Letter A  Arts Gallery  Logo (1).png";
+import { useForm } from "react-hook-form";
 
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => console.log(data);
+
   return (
     <div className="h-full">
       <MainWidth>
         <div className="h-full">
           <>
-            {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-white dark:bg-gray-900">
-        <body class="h-full">
-        ```
-      */}
             <div className="flex min-h-full items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
               <div className="w-full max-w-sm space-y-10">
                 <div>
@@ -33,30 +34,43 @@ const Login = () => {
                     Sign in to your account
                   </h2>
                 </div>
-                <form action="#" method="POST" className="space-y-6">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   <div>
                     <div className="col-span-2">
                       <input
+                        {...register("email", { required: "Email is required" })}
                         id="email-address"
                         name="email"
                         type="email"
-                        required
-                        placeholder="Email address"
+                        placeholder={errors.email ? errors.email.message : "Email address"}
                         autoComplete="email"
                         aria-label="Email address"
-                        className="block w-full rounded-t-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-gray-700 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                        aria-invalid={errors.email ? "true" : "false"}
+                        className={`block w-full rounded-t-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 placeholder:text-gray-400 focus:relative focus:outline-2 focus:-outline-offset-2 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 ${
+                          errors.email
+                            ? "outline-red-500 focus:outline-red-500"
+                            : "outline-gray-300 focus:outline-indigo-600 dark:outline-gray-700 dark:focus:outline-indigo-500"
+                        }`}
                       />
                     </div>
                     <div className="-mt-px">
                       <input
+                        {...register("password", { required: "Password is required" })}
                         id="password"
                         name="password"
                         type="password"
-                        required
-                        placeholder="Password"
+                        placeholder={errors.password ? errors.password.message : "Password"}
                         autoComplete="current-password"
                         aria-label="Password"
-                        className="block w-full rounded-b-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-gray-700 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+                        aria-invalid={errors.password ? "true" : "false"}
+                        className={`block w-full rounded-b-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 placeholder:text-gray-400 focus:relative focus:outline-2 focus:-outline-offset-2 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 ${
+                          errors.password
+                            ? "outline-red-500 focus:outline-red-500"
+                            : "outline-gray-300 focus:outline-indigo-600 dark:outline-gray-700 dark:focus:outline-indigo-500"
+                        }`}
                       />
                     </div>
                   </div>
