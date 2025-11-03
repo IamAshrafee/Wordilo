@@ -7,7 +7,7 @@ import Collection from "./pages/collection/Collection";
 import FlashCard from "./pages/flashcard/FlashCard";
 import Profile from "./pages/user-profile/Profile";
 import Login from "./pages/authentication/Login";
-import SingUp from "./pages/authentication/Singup";
+import SingUp from "./pages/authentication/SingUp";
 
 const router = createBrowserRouter([
   {

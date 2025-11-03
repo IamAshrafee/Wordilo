@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import MainWidth from "../../components/layout/MainWidth";
 import WordiloLogo from "../../assets/png/Black White Minimal Simple Modern Letter A  Arts Gallery  Logo (1).png";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import SimpleNotification from "../../components/ui/SimpleNotification";
 
 const SingUp = () => {
   const {
@@ -9,11 +11,48 @@ const SingUp = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notification, setNotification] = useState({
+    show: false,
+    title: "",
+    message: "",
+    type: "",
+  });
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/user/create`,
+        data
+      );
+      setNotification({
+        show: true,
+        title: "Success",
+        message: response.data.message,
+        type: "success",
+      });
+    } catch (error) {
+      setNotification({
+        show: true,
+        title: "Error",
+        message: error.response.data.message,
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="h-full">
+      <SimpleNotification
+        show={notification.show}
+        setShow={(val) => setNotification({ ...notification, show: val })}
+        title={notification.title}
+        message={notification.message}
+        type={notification.type}
+      />
       <MainWidth>
         <div className="h-full">
           <div className="flex min-h-full items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
@@ -103,9 +142,10 @@ const SingUp = () => {
                 <div>
                   <button
                     type="submit"
-                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
+                    disabled={isSubmitting}
+                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500 disabled:bg-indigo-400"
                   >
-                    Sign up
+                    {isSubmitting ? "Signing up..." : "Sign up"}
                   </button>
                 </div>
               </form>
