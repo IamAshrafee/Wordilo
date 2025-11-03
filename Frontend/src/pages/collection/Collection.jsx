@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import MainWidth from "../../components/layout/MainWidth";
 import WordCard from "../../components/ui/WordCard";
 import WordDetailCard from "./WordDetailCard";
@@ -10,23 +10,41 @@ const Collection = () => {
   const [words, setWords] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [groupedWords, setGroupedWords] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Check if mobile on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Fetch words from your API
   useEffect(() => {
     const fetchWords = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const response = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/word/get`
         );
         setWords(response.data.data);
       } catch (error) {
         console.error("Error fetching words:", error);
+        setError("Failed to load words. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchWords();
-  }, [words]);
+  }, []);
 
-  // Group words by date whenever words change
+  // Group words by date whenever words or search term change
   useEffect(() => {
     if (words.length > 0) {
       const filteredWords = words.filter((word) =>
@@ -34,30 +52,27 @@ const Collection = () => {
       );
       const grouped = groupWordsByDate(filteredWords);
       setGroupedWords(grouped);
+    } else {
+      setGroupedWords({});
     }
   }, [words, searchTerm]);
 
-  // This function groups words by their creation date
-  const groupWordsByDate = (wordsArray) => {
+  // Memoize the grouping function
+  const groupWordsByDate = useCallback((wordsArray) => {
     const groups = {};
 
     wordsArray.forEach((word) => {
-      // Get just the date part (YYYY-MM-DD)
       const dateString = new Date(word.createAt).toISOString().split("T")[0];
 
-      // If this date doesn't exist in groups yet, create an empty array
       if (!groups[dateString]) {
         groups[dateString] = [];
       }
 
-      // Add this word to the array for this date
       groups[dateString].push(word);
     });
 
-
-
     return groups;
-  };
+  }, []);
 
   // Format date to look nice: "1 Nov 2025"
   const formatDate = (dateString) => {
@@ -66,7 +81,7 @@ const Collection = () => {
     return date.toLocaleDateString("en-GB", options);
   };
 
-  const HandleWordClick = (word) => {
+  const handleWordClick = (word) => {
     setSelectedWord(word);
   };
 
@@ -79,13 +94,38 @@ const Collection = () => {
       await axios.delete(`${import.meta.env.VITE_BASE_URL}/word/delete/${wordId}`);
       const newWords = words.filter((word) => word._id !== wordId);
       setWords(newWords);
-      const grouped = groupWordsByDate(newWords);
-      setGroupedWords(grouped);
-      setSelectedWord(null);
+      handleClose();
     } catch (error) {
       console.error("Error deleting word:", error);
+      setError("Failed to delete word. Please try again.");
     }
   };
+
+  // Handle escape key to close modal - FIXED: Only disable scroll on mobile
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
+        handleClose();
+      }
+    };
+
+    if (selectedWord) {
+      document.addEventListener("keydown", handleEscape);
+      
+      // ONLY disable body scroll on mobile when modal is open
+      if (isMobile) {
+        document.body.style.overflow = "hidden";
+      }
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      // ONLY re-enable scroll if we're on mobile and had disabled it
+      if (isMobile) {
+        document.body.style.overflow = "unset";
+      }
+    };
+  }, [selectedWord, isMobile]); // Added isMobile to dependency array
 
   return (
     <div className="mt-8">
@@ -94,43 +134,65 @@ const Collection = () => {
           <input
             type="text"
             placeholder="Search words..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            aria-label="Search words"
           />
         </div>
 
-        {/* Mobile Overlay Background */}
-        {selectedWord && (
-          <div
-            className="fixed inset-0 bg-black/50 bg-opacity-50 backdrop-blur-sm z-40 md:hidden"
-            onClick={handleClose}
-          />
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
         )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+
+        {/* Mobile Overlay Background */}
+        <AnimatePresence>
+          {selectedWord && (
+            <>
+              {/* Only show overlay on mobile */}
+              {isMobile && (
+                <motion.div
+                  className="fixed inset-0 bg-black/50 bg-opacity-50 backdrop-blur-sm z-40 md:hidden"
+                  onClick={handleClose}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                />
+              )}
+            </>
+          )}
+        </AnimatePresence>
 
         <div className={`mt-8 ${selectedWord ? "md:flex md:gap-8" : ""}`}>
           {/* Word Detail Sidebar - appears on LEFT when word is selected */}
-          {selectedWord && (
-            <>
-              {/* Desktop Sidebar - LEFT SIDE */}
-              <div className="hidden md:block md:shrink-0 md:w-96">
-                <div className="sticky top-8 h-[calc(100vh-4rem)]">
-                  <AnimatePresence>
-                    {selectedWord && (
-                      <WordDetailCard
-                        word={selectedWord}
-                        handleClose={handleClose}
-                        handleDelete={handleDelete}
-                      />
-                    )}
-                  </AnimatePresence>
+          <AnimatePresence>
+            {selectedWord && (
+              <>
+                {/* Desktop Sidebar - LEFT SIDE */}
+                <div className="hidden md:block md:shrink-0 md:w-96">
+                  <div className="sticky top-8 h-[calc(100vh-4rem)] overflow-y-auto">
+                    <WordDetailCard
+                      word={selectedWord}
+                      handleClose={handleClose}
+                      handleDelete={handleDelete}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Mobile Popup */}
-              <AnimatePresence>
-                {selectedWord && (
+                {/* Mobile Popup - Only show on mobile */}
+                {isMobile && (
                   <motion.div
-                    className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 z-50 md:hidden"
+                    className="fixed inset-x-4 top-1/2 transform -translate-y-1/2 z-50 md:hidden max-h-[85vh] overflow-hidden"
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}
@@ -143,22 +205,29 @@ const Collection = () => {
                     />
                   </motion.div>
                 )}
-              </AnimatePresence>
-            </>
-          )}
+              </>
+            )}
+          </AnimatePresence>
 
           {/* Word List Section - adjusts width based on selection */}
           <div className={`${selectedWord ? "md:flex-1" : "w-full"} pb-4`}>
-            {/* Loop through each date group */}
-            {Object.keys(groupedWords).length === 0 ? (
-              <p className="text-center text-gray-500">No words found.</p>
-            ) : (
+            {/* Empty State */}
+            {!loading && Object.keys(groupedWords).length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">
+                  {searchTerm ? "No words match your search." : "No words found. Start by adding some words!"}
+                </p>
+              </div>
+            )}
+
+            {/* Word Groups */}
+            {Object.keys(groupedWords).length > 0 && (
               Object.keys(groupedWords)
                 .sort()
                 .reverse()
                 .map((date) => (
                   <div key={date} className="mb-8">
-                    <p className="font-istok font-bold my-5">
+                    <p className="font-istok font-bold my-5 text-gray-700">
                       {formatDate(date)}
                     </p>
                     <motion.div
@@ -182,7 +251,7 @@ const Collection = () => {
                           word={word.word}
                           meaning={word.meanings.join(", ")}
                           description={word.description}
-                          onClick={() => HandleWordClick(word)}
+                          onClick={() => handleWordClick(word)}
                         />
                       ))}
                     </motion.div>

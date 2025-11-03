@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router/dom";
 import RootLayout from "./RootLayout";
 import CreateWord from "./pages/home/CreateWord";
 import Collection from "./pages/collection/Collection";
+import FlashCard from "./pages/flashcard/FlashCard";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
       {
         path: "/collection",
         element: <Collection />,
+      },
+      {
+        path: "/flashcards",
+        element: <FlashCard />,
       },
     ],
   },

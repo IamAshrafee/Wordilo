@@ -5,8 +5,6 @@ import Footer from "./components/layout/Footer";
 import MobileNavigation from "./components/layout/MobileNavigation";
 import TopNav from "./components/layout/TopNav";
 
-// This is the main root layout this component is used to render fixed header and footer and the child pages inside
-
 const RootLayout = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -17,6 +15,7 @@ const RootLayout = () => {
 
     window.addEventListener("resize", handleResize);
 
+    // Cleanup function to prevent memory leaks
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -26,13 +25,13 @@ const RootLayout = () => {
     <div className="flex flex-col min-h-screen">
       <TopNav />
       {isMobile ? (
-        <div className="fixed bottom-0 w-full">
+        <div className="fixed bottom-0 w-full z-30">
           <MobileNavigation />
         </div>
       ) : (
         <DesktopNavbar />
       )}
-      <main className="grow flex flex-col">
+      <main className={`grow flex flex-col ${isMobile ? 'mb-16' : ''}`}>
         <Outlet />
       </main>
       {!isMobile && <Footer />}
