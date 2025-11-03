@@ -11,9 +11,9 @@ const TopNav = () => {
           <div>
             <Link to={"/create"} className="font-istok font-bold text-2xl">Wordilo</Link>
           </div>
-          <div>
+          <Link to={"/profile"}>
             <CgProfile size={28} />
-          </div>
+          </Link>
         </div>
       </MainWidth>
     </div>

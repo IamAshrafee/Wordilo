@@ -21,6 +21,7 @@ const CreateWord = () => {
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm();
 
   const isEditMode = Boolean(wordId);
@@ -42,25 +43,25 @@ const CreateWord = () => {
         }
       };
       fetchWord();
+    } else {
+      reset();
     }
-  }, [isEditMode, wordId, setValue]);
+  }, [isEditMode, wordId, setValue, reset]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
       if (isEditMode) {
-        await axios.patch(
+        await axios.put(
           `${import.meta.env.VITE_BASE_URL}/word/update/${wordId}`,
           data
         );
         toast.success("Successfully updated!");
         navigate("/collection");
       } else {
-        await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/word/create`,
-          data
-        );
+        await axios.post(`${import.meta.env.VITE_BASE_URL}/word/create`, data);
         toast.success("Successfully created!");
+        reset();
       }
     } catch (error) {
       console.log(error);
@@ -77,7 +78,9 @@ const CreateWord = () => {
         <div className="md:w-[800px]">
           <div className="flex flex-col justify-center items-center">
             <h1 className="font-istok font-bold text-2xl text-center">
-              {isEditMode ? "Modify Your Vocabulary" : "Create a New Vocabulary"}
+              {isEditMode
+                ? "Modify Your Vocabulary"
+                : "Create a New Vocabulary"}
             </h1>
             <p className="font-istok font-medium text-gray-500 text-center">
               Complete the fields you want to save for the specific word
@@ -125,14 +128,14 @@ const CreateWord = () => {
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
-                  className="bg-gray-300 text-gray-800 font-istok font-bold px-4 py-2 rounded-md hover:bg-gray-400"
+                  className="cursor-pointer bg-gray-300 text-gray-800 font-istok font-bold px-4 py-2 rounded-md hover:bg-gray-400"
                 >
                   Cancel
                 </button>
               )}
               <button
                 type="submit"
-                className="bg-indigo-600 text-white font-istok font-bold px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-400"
+                className="cursor-pointer bg-indigo-600 text-white font-istok font-bold px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-400"
                 disabled={isSubmitting}
               >
                 {isSubmitting

@@ -5,6 +5,7 @@ import RootLayout from "./RootLayout";
 import CreateWord from "./pages/home/CreateWord";
 import Collection from "./pages/collection/Collection";
 import FlashCard from "./pages/flashcard/FlashCard";
+import Profile from "./pages/user-profile/Profile";
 
 const router = createBrowserRouter([
   {
@@ -27,7 +28,11 @@ const router = createBrowserRouter([
       {
         path: "/modify-word/:wordId",
         element: <CreateWord />,
-      }
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
     ],
   },
 ]);

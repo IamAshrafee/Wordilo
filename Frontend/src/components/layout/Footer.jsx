@@ -1,9 +1,16 @@
-import React from 'react'
+import React from "react";
+import MainWidth from "./MainWidth";
 
 const Footer = () => {
   return (
-    <div>Footer</div>
-  )
-}
+    <div>
+      <MainWidth>
+        <div>
+          
+        </div>
+      </MainWidth>
+    </div>
+  );
+};
 
-export default Footer
+export default Footer;

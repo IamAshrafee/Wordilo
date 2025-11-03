@@ -17,7 +17,7 @@ const WordDetailCard = ({ word, handleClose, handleDelete }) => {
     >
       <motion.button 
         onClick={handleClose} 
-        className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
+        className="cursor-pointer absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         aria-label="Close word details"
@@ -47,7 +47,7 @@ const WordDetailCard = ({ word, handleClose, handleDelete }) => {
         <div className="mt-8 flex gap-4 pt-4 border-t border-gray-100">
           <Link to={`/modify-word/${word._id}`}>
             <motion.button 
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+              className="cursor-pointer flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               aria-label="Edit word"
@@ -62,7 +62,7 @@ const WordDetailCard = ({ word, handleClose, handleDelete }) => {
                 handleDelete(word._id);
               }
             }}
-            className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors"
+            className="cursor-pointer flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             aria-label="Delete word"
