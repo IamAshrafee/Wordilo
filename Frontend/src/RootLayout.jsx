@@ -31,7 +31,7 @@ const RootLayout = () => {
       ) : (
         <DesktopNavbar />
       )}
-      <main className={`grow flex flex-col ${isMobile ? 'mb-16' : ''}`}>
+      <main className={`grow h-full flex flex-col ${isMobile ? 'mb-16' : ''}`}>
         <Outlet />
       </main>
       {!isMobile && <Footer />}

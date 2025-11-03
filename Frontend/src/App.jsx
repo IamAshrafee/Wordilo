@@ -6,6 +6,8 @@ import CreateWord from "./pages/home/CreateWord";
 import Collection from "./pages/collection/Collection";
 import FlashCard from "./pages/flashcard/FlashCard";
 import Profile from "./pages/user-profile/Profile";
+import Login from "./pages/authentication/Login";
+import SingUp from "./pages/authentication/Singup";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +36,14 @@ const router = createBrowserRouter([
         element: <Profile />,
       },
     ],
+  },
+  {
+    path: "/signin",
+    element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <SingUp />,
   },
 ]);
 
